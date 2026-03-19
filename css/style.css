@@ -1,0 +1,363 @@
+/* =====================================================
+   AUDIT RUNNER: The FinanceOS Protocol
+   Base Styles — Bloomberg Terminal meets Arcade Game
+   ===================================================== */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&display=swap');
+
+/* CSS Variables */
+:root {
+  --bg-primary:       #0D1117;
+  --bg-secondary:     #161B22;
+  --gold:             #D4A017;
+  --gold-light:       #F0C040;
+  --green-verified:   #1A7A4A;
+  --green-light:      #2ECC71;
+  --red-shadow:       #C0392B;
+  --red-light:        #E74C3C;
+  --yellow-unverified:#E67E22;
+  --blue-pl:          #1A4A7A;
+  --blue-light:       #3498DB;
+  --text-primary:     #E8E8E8;
+  --text-muted:       #8A8A9A;
+  --border:           #2A2A3A;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Game Container */
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+}
+
+/* Phaser canvas */
+#game-container canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Scanline overlay — subtle CRT effect */
+#game-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* =====================================================
+   AUDIT SCENE — Surprise Audit DOM Overlay
+   ===================================================== */
+
+/* Terrible Spreadsheet overlay for Scenario B */
+#audit-spreadsheet {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 760px;
+  max-width: 90vw;
+  background: #f0f0f0;
+  border: 3px solid #888;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  z-index: 100;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-size: 12px;
+  display: none;
+  user-select: none;
+}
+
+#audit-spreadsheet .ss-titlebar {
+  background: #c0c0c0;
+  padding: 4px 8px;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+  border-bottom: 1px solid #888;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#audit-spreadsheet .ss-tabs {
+  background: #d4d4d4;
+  display: flex;
+  gap: 2px;
+  padding: 4px 4px 0;
+  border-bottom: 1px solid #888;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+}
+
+#audit-spreadsheet .ss-tab {
+  padding: 3px 10px;
+  background: #c8c8c8;
+  border: 1px solid #999;
+  border-bottom: none;
+  cursor: default;
+  color: #333;
+}
+
+#audit-spreadsheet .ss-tab.active {
+  background: #fff;
+  font-weight: bold;
+}
+
+#audit-spreadsheet .ss-formula-bar {
+  padding: 3px 8px;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  color: #333;
+}
+
+#audit-spreadsheet .ss-grid {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+#audit-spreadsheet .ss-grid th {
+  background: #e8e8e8;
+  border: 1px solid #ccc;
+  padding: 3px 8px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  font-weight: normal;
+  color: #555;
+  min-width: 80px;
+}
+
+#audit-spreadsheet .ss-grid td {
+  border: 1px solid #ddd;
+  padding: 3px 6px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 120px;
+  text-overflow: ellipsis;
+}
+
+#audit-spreadsheet .ss-grid td:hover {
+  background: #e8f4ff;
+}
+
+#audit-spreadsheet .ss-grid td.row-header {
+  background: #e8e8e8;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  color: #555;
+  cursor: default;
+  min-width: 28px;
+}
+
+#audit-spreadsheet .ss-grid td.correct-cell {
+  outline: 2px solid rgba(212, 160, 23, 0.6);
+  outline-offset: -2px;
+}
+
+#audit-spreadsheet .ss-grid td.correct-cell:hover {
+  background: rgba(212, 160, 23, 0.15);
+}
+
+#audit-spreadsheet .ss-grid tr.merged td {
+  background: #ffe0e0;
+  font-size: 8px;
+  color: #c00;
+}
+
+#audit-spreadsheet .ss-timer {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: var(--red-light);
+  color: white;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+#audit-spreadsheet .ss-instruction {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: rgba(0,0,0,0.8);
+  color: var(--gold);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+/* =====================================================
+   RESULT SCREEN — Share Card & Buttons
+   ===================================================== */
+
+#share-ui {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 12px;
+  z-index: 50;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#share-ui button {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 13px;
+  padding: 10px 20px;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+#share-ui button:hover {
+  background: var(--gold);
+  color: var(--bg-primary);
+}
+
+#share-ui button.primary {
+  background: var(--gold);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+
+#share-ui button.primary:hover {
+  background: var(--gold-light);
+  border-color: var(--gold-light);
+}
+
+/* Share canvas preview */
+#share-canvas-preview {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  pointer-events: none;
+}
+
+/* =====================================================
+   KIOSK MODE
+   ===================================================== */
+
+body.kiosk-mode #game-container canvas {
+  cursor: none;
+}
+
+body.kiosk-mode #share-ui button {
+  font-size: 16px;
+  padding: 16px 28px;
+  min-width: 80px;
+  min-height: 80px;
+}
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+
+@media (max-width: 767px) {
+  #audit-spreadsheet {
+    width: 95vw;
+    font-size: 10px;
+  }
+
+  #audit-spreadsheet .ss-grid td {
+    padding: 2px 4px;
+    font-size: 9px;
+  }
+}
+
+/* Loading indicator before Phaser boots */
+#loading-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loading-screen .logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  margin-bottom: 32px;
+}
+
+#loading-screen .spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#loading-screen .loading-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  letter-spacing: 0.1em;
+}
