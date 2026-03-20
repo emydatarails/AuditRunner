@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Audit Runner: The FinanceOS Protocol — A fast-paced arcade game for FP&A professionals. Powered by Datarails." />
+  <meta name="theme-color" content="#0D1117" />
+
+  <!-- Open Graph (LinkedIn share preview) -->
+  <meta property="og:title"       content="Audit Runner: The FinanceOS Protocol" />
+  <meta property="og:description" content="In the world of Finance, Truth is the only Currency. Play now." />
+  <meta property="og:url"         content="https://datarails.com/audit-runner" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:image"       content="https://datarails.com/audit-runner/preview.png" />
+
+  <title>Audit Runner: The FinanceOS Protocol — Datarails</title>
+
+  <!-- Google Fonts (IBM Plex Mono + Playfair Display) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Game Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Phaser 3 (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <!-- Loading screen (shown before Phaser boots) -->
+  <div id="loading-screen">
+    <div class="logo">DATARAILS</div>
+    <div class="spinner"></div>
+    <div class="loading-text">INITIALIZING FINANCEOS PROTOCOL...</div>
+  </div>
+
+  <!-- Phaser canvas target -->
+  <div id="game-container"></div>
+
+  <!-- Surprise Audit — Scenario B spreadsheet DOM overlay -->
+  <div id="audit-spreadsheet" style="position:absolute;display:none;z-index:100;"></div>
+
+  <!-- Hidden share canvas (for PNG generation) -->
+  <canvas id="share-canvas-preview" style="display:none;"></canvas>
+
+  <!-- ─── Game Data & Copy ─────────────────────────── -->
+  <script src="js/data/copy.js"></script>
+
+  <!-- ─── Game Systems ─────────────────────────────── -->
+  <script src="js/systems/BlockSystem.js"></script>
+  <script src="js/systems/GovernanceGate.js"></script>
+  <script src="js/systems/AuditTrail.js"></script>
+  <script src="js/systems/ScoreSystem.js"></script>
+  <script src="js/systems/AICore.js"></script>
+
+  <!-- ─── Utilities ────────────────────────────────── -->
+  <script src="js/utils/ShareCard.js"></script>
+
+  <!-- ─── Scenes ───────────────────────────────────── -->
+  <script src="js/scenes/BootScene.js"></script>
+  <script src="js/scenes/MenuScene.js"></script>
+  <script src="js/scenes/AuditScene.js"></script>
+  <script src="js/scenes/ResultScene.js"></script>
+  <script src="js/scenes/GameScene.js"></script>
+
+  <!-- ─── Main (boots Phaser) ──────────────────────── -->
+  <script src="js/main.js"></script>
+
+  <!-- Mobile orientation hint -->
+  <script>
+    (function() {
+      const orientMsg = document.createElement('div');
+      orientMsg.id = 'orient-msg';
+      orientMsg.style.cssText = [
+        'display:none','position:fixed','top:0','left:0','width:100%','height:100%',
+        'background:#0D1117','color:#D4A017','font-family:Courier New,monospace',
+        'font-size:16px','text-align:center','padding-top:40%','z-index:9999',
+        'pointer-events:none',
+      ].join(';');
+      orientMsg.innerHTML = '↕ Please rotate your device to portrait mode';
+      document.body.appendChild(orientMsg);
+
+      function checkOrientation() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        const isNarrow    = window.innerWidth < 768;
+        orientMsg.style.display = (isLandscape && isNarrow) ? 'block' : 'none';
+      }
+      window.addEventListener('resize', checkOrientation);
+      window.addEventListener('orientationchange', checkOrientation);
+      checkOrientation();
+    })();
+  </script>
+</body>
+</html>
